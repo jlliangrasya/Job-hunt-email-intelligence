@@ -9,7 +9,7 @@ export function StepDone({ detected }) {
       <div>
         <h2 className="text-xl font-bold">You're all set!</h2>
         <p className="text-muted-foreground mt-1">
-          Found {detected} application{detected !== 1 ? "s" : ""} in your Gmail.
+          Found <strong>{detected}</strong> application{detected !== 1 ? "s" : ""} in your Gmail.
         </p>
       </div>
       <Button render={<Link href="/dashboard" />}>Go to Dashboard</Button>

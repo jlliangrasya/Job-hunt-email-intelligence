@@ -33,5 +33,6 @@ test('advances from step 2 to step 3 when scan completes', async () => {
   const user = userEvent.setup()
   render(<OnboardingWizard hasGmail={true} />)
   await user.click(screen.getByRole('button', { name: /complete scan/i }))
-  expect(screen.getByText(/5 applications/i)).toBeInTheDocument()
+  expect(screen.getByRole('heading', { name: /you're all set/i })).toBeInTheDocument()
+  expect(screen.getByText('5')).toBeInTheDocument()
 })

@@ -9,7 +9,7 @@ export function StepScanProgress({ onNext }) {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    let aborted = false;
+    const controller = new AbortController();
 
     async function runScan() {
       try {
@@ -17,30 +17,31 @@ export function StepScanProgress({ onNext }) {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ mode: "initial" }),
+          signal: controller.signal,
         });
         if (!res.ok) { setError("Scan failed. Please try again."); return; }
 
         const reader = res.body.getReader();
         const decoder = new TextDecoder();
 
-        while (!aborted) {
+        while (!controller.signal.aborted) {
           const { done: streamDone, value } = await reader.read();
           if (streamDone) break;
           const lines = decoder.decode(value).split("\n").filter((l) => l.startsWith("data: "));
           for (const line of lines) {
             const payload = line.slice(6).trim();
-            if (payload === "[DONE]") { setDone(true); return; }
-            try { setProgress(JSON.parse(payload)); } catch {}
+            if (payload === "[DONE]") { reader.cancel(); setDone(true); return; }
+            try { setProgress(JSON.parse(payload)); } catch (e) { console.error("SSE parse error:", e); }
           }
         }
         setDone(true);
-      } catch {
-        if (!aborted) setError("Scan failed. Please try again.");
+      } catch (e) {
+        if (!controller.signal.aborted) setError("Scan failed. Please try again.");
       }
     }
 
     runScan();
-    return () => { aborted = true; };
+    return () => { controller.abort(); };
   }, []);
 
   const pct = progress.total > 0 ? Math.round((progress.scanned / progress.total) * 100) : 0;
