@@ -9,24 +9,28 @@ export function SettingsForm({ userId, settings }) {
   const [digestEnabled, setDigestEnabled] = useState(settings.email_digest_enabled);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [saveError, setSaveError] = useState(null);
   const router = useRouter();
   const supabase = useSupabase();
 
   async function handleSave(e) {
     e.preventDefault();
     setSaving(true);
-    await supabase
+    setSaveError(null);
+    const { error } = await supabase
       .from("user_settings")
       .update({ follow_up_delay_days: Number(followUpDays), email_digest_enabled: digestEnabled })
       .eq("user_id", userId);
     setSaving(false);
+    if (error) { setSaveError("Failed to save. Please try again."); return; }
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
   }
 
   async function handleDisconnect() {
     if (!confirm("Disconnect Gmail? You'll need to reconnect to keep using the app.")) return;
-    await fetch("/api/auth/revoke", { method: "POST" });
+    const res = await fetch("/api/auth/revoke", { method: "POST" });
+    if (!res.ok) { alert("Failed to disconnect. Please try again."); return; }
     router.push("/login");
   }
 
@@ -69,6 +73,7 @@ export function SettingsForm({ userId, settings }) {
         <Button type="submit" disabled={saving} className="self-start">
           {saved ? "Saved!" : saving ? "Saving..." : "Save Changes"}
         </Button>
+        {saveError && <p className="text-sm text-destructive">{saveError}</p>}
       </form>
 
       <div className="rounded-xl border border-destructive/30 bg-card p-5 flex flex-col gap-3">
