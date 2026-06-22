@@ -6,6 +6,7 @@ import { relativeTime } from "@/lib/utils/date";
 import { StatusBadge } from "./StatusBadge";
 import { FilterBar } from "./FilterBar";
 import { StatsCards } from "./StatsCards";
+import { Inbox } from "lucide-react";
 
 export function ApplicationsTable({ initialApplications, userId }) {
   const [applications, setApplications] = useState(initialApplications);
@@ -60,9 +61,10 @@ export function ApplicationsTable({ initialApplications, userId }) {
           />
         </div>
         {filtered.length === 0 ? (
-          <p className="px-4 py-12 text-center text-sm text-muted-foreground">
-            No applications found.
-          </p>
+          <div className="flex flex-col items-center gap-3 py-16 text-muted-foreground">
+            <Inbox className="size-10 opacity-40" />
+            <p className="text-sm">No applications found.</p>
+          </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">

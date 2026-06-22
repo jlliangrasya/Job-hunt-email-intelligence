@@ -12,10 +12,10 @@ const NAV_ITEMS = [
 export function Sidebar() {
   const pathname = usePathname();
   return (
-    <aside className="w-56 flex flex-col border-r border-border bg-sidebar shrink-0">
-      <div className="flex items-center gap-2 px-4 h-14 border-b border-border">
+    <aside className="w-56 flex flex-col border-r border-border bg-card shrink-0">
+      <div className="flex items-center gap-2.5 px-4 h-14 border-b border-border">
         <Briefcase className="size-5 text-primary" />
-        <span className="font-semibold text-sm">Job Hunt Intel</span>
+        <span className="font-semibold text-base tracking-tight">Job Hunt Intel</span>
       </div>
       <nav className="flex flex-col gap-1 p-2 flex-1">
         {NAV_ITEMS.map(({ href, label, icon: Icon }) => (
@@ -23,10 +23,10 @@ export function Sidebar() {
             key={href}
             href={href}
             className={cn(
-              "flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+              "flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition-colors",
               pathname === href
-                ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                ? "bg-sidebar-accent text-primary font-medium"
+                : "text-muted-foreground hover:text-foreground hover:bg-muted"
             )}
           >
             <Icon className="size-4" />
