@@ -10,6 +10,8 @@ export default async function OnboardingPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
+  if (!user) redirect("/login");
+
   const { data: settings } = await supabase
     .from("user_settings")
     .select("onboarding_completed")
