@@ -13,7 +13,8 @@ jest.mock('@/components/onboarding/StepScanProgress', () => ({
 
 test('starts on step 1 (connect gmail) when hasGmail is false', () => {
   render(<OnboardingWizard hasGmail={false} />)
-  expect(screen.getByText(/connect gmail/i)).toBeInTheDocument()
+  // The "Already connected — continue" button only appears on step 0
+  expect(screen.getByRole('button', { name: /already connected/i })).toBeInTheDocument()
 })
 
 test('starts on step 2 (scan) when hasGmail is true', () => {

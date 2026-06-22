@@ -29,11 +29,9 @@ export function OnboardingWizard({ hasGmail }) {
             >
               {i + 1}
             </div>
-            <span
-              data-label={label}
-              aria-hidden="true"
-              className={`text-sm before:content-[attr(data-label)] ${i === step ? "font-medium" : "text-muted-foreground"}`}
-            />
+            <span className={`text-sm ${i === step ? "font-medium" : "text-muted-foreground"}`}>
+              {label}
+            </span>
             {i < STEP_LABELS.length - 1 && (
               <div className={`h-px w-8 ${i < step ? "bg-primary" : "bg-border"}`} />
             )}
