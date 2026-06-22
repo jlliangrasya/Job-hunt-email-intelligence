@@ -1,0 +1,30 @@
+import { redirect } from "next/navigation";
+import { createClient } from "@/lib/supabase/server";
+import { SettingsForm } from "@/components/settings/SettingsForm";
+
+export const metadata = { title: "Settings — Job Hunt Intel" };
+
+export default async function SettingsPage() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) redirect("/login");
+
+  const { data: settings } = await supabase
+    .from("user_settings")
+    .select("follow_up_delay_days, email_digest_enabled, scan_lookback_days")
+    .eq("user_id", user.id)
+    .single();
+
+  return (
+    <div className="p-6 flex flex-col gap-6 max-w-xl mx-auto">
+      <h1 className="text-2xl font-bold">Settings</h1>
+      <SettingsForm
+        userId={user.id}
+        settings={settings ?? { follow_up_delay_days: 7, email_digest_enabled: false, scan_lookback_days: 90 }}
+      />
+    </div>
+  );
+}
