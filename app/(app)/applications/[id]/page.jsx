@@ -7,9 +7,10 @@ import { DraftPanel } from "@/components/application/DraftPanel";
 export default async function ApplicationDetailPage({ params }) {
   const { id } = await params;
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { data: { user: authUser } } = await supabase.auth.getUser();
+  const user = authUser ?? (process.env.NEXT_PUBLIC_DEV_PREVIEW === "true"
+    ? { id: "00000000-0000-0000-0000-000000000000", email: "preview@dev.local" }
+    : null);
 
   if (!user) redirect("/login");
 
