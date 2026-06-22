@@ -89,8 +89,10 @@ export function DraftPanel({ applicationId, initialDrafts }) {
       {drafts.length > 1 && (
         <div className="flex gap-1 flex-wrap">
           {drafts.map((d, i) => (
-            <button
+            <Button
               key={d.id}
+              variant="ghost"
+              size="sm"
               onClick={() => setActiveDraftId(d.id)}
               className={`text-xs px-2 py-1 rounded-md border transition-colors ${
                 d.id === activeDraftId
@@ -99,7 +101,7 @@ export function DraftPanel({ applicationId, initialDrafts }) {
               }`}
             >
               Draft {i + 1}
-            </button>
+            </Button>
           ))}
         </div>
       )}

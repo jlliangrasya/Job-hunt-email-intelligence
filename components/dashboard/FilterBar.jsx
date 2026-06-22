@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Search } from "lucide-react";
 
 const STATUSES = [
@@ -16,6 +16,8 @@ const STATUSES = [
 
 export function FilterBar({ statusFilter, searchQuery, onStatusChange, onSearchChange }) {
   const [internalSearch, setInternalSearch] = useState(searchQuery);
+
+  useEffect(() => { setInternalSearch(searchQuery); }, [searchQuery]);
 
   function handleSearchChange(e) {
     setInternalSearch(e.target.value);

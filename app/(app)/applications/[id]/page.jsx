@@ -1,4 +1,4 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { ApplicationMeta } from "@/components/application/ApplicationMeta";
 import { ThreadViewer } from "@/components/application/ThreadViewer";
@@ -10,6 +10,8 @@ export default async function ApplicationDetailPage({ params }) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
+
+  if (!user) redirect("/login");
 
   const { data: application } = await supabase
     .from("applications")
@@ -31,8 +33,8 @@ export default async function ApplicationDetailPage({ params }) {
       const data = await res.json();
       messages = data.messages ?? [];
     }
-  } catch {
-    // Thread fetch failure is non-fatal
+  } catch (e) {
+    console.error("Thread fetch failed:", e);
   }
 
   const { data: drafts } = await supabase

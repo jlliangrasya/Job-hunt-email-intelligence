@@ -1,3 +1,4 @@
+import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { ApplicationsTable } from "@/components/dashboard/ApplicationsTable";
 
@@ -8,6 +9,8 @@ export default async function DashboardPage() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
+
+  if (!user) redirect("/login");
 
   const { data: applications } = await supabase
     .from("applications")

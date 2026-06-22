@@ -1,3 +1,4 @@
+"use client";
 import { NotificationBell } from "./NotificationBell";
 
 export function TopNav({ user, notificationCount, notifications, onMarkRead }) {
