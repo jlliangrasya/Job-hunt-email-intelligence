@@ -14,5 +14,5 @@ test('renders Dashboard and Settings nav links', () => {
 test('marks current route link as active', () => {
   render(<Sidebar />)
   const dashLink = screen.getByRole('link', { name: /dashboard/i })
-  expect(dashLink.className).toMatch(/bg-sidebar-accent/)
+  expect(dashLink.className).toMatch(/text-primary/)
 })

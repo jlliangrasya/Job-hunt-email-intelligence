@@ -15,7 +15,7 @@ export default async function SettingsPage() {
 
   const { data: settings } = await supabase
     .from("user_settings")
-    .select("follow_up_delay_days, email_digest_enabled, scan_lookback_days")
+    .select("stale_threshold_days, email_digest_enabled, detection_lookback_days")
     .eq("user_id", user.id)
     .single();
 
@@ -24,7 +24,7 @@ export default async function SettingsPage() {
       <h1 className="text-2xl font-bold">Settings</h1>
       <SettingsForm
         userId={user.id}
-        settings={settings ?? { follow_up_delay_days: 7, email_digest_enabled: false, scan_lookback_days: 90 }}
+        settings={settings ?? { stale_threshold_days: 7, email_digest_enabled: false, detection_lookback_days: 90 }}
       />
     </div>
   );

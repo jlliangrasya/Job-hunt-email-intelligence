@@ -1,17 +1,11 @@
 "use client";
 import { useState, useEffect } from "react";
 import { Search } from "lucide-react";
+import { getDomainConfig } from "@/lib/opportunity/domain-config";
 
 const STATUSES = [
-  { value: "",              label: "All Statuses" },
-  { value: "applied",       label: "Applied" },
-  { value: "replied",       label: "Replied" },
-  { value: "interview",     label: "Interview" },
-  { value: "offer",         label: "Offer" },
-  { value: "rejected",      label: "Rejected" },
-  { value: "ghosted",       label: "Ghosted" },
-  { value: "follow_up_due", label: "Follow Up Due" },
-  { value: "withdrawn",     label: "Withdrawn" },
+  { value: "", label: "All Statuses" },
+  ...Object.entries(getDomainConfig("job").statuses).map(([value, { label }]) => ({ value, label })),
 ];
 
 export function FilterBar({ statusFilter, searchQuery, onStatusChange, onSearchChange }) {

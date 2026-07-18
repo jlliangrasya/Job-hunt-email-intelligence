@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { useSupabase } from "./SupabaseProvider";
 
-export function RealtimeProvider({ userId, onApplicationChange, onNotification, children }) {
+export function RealtimeProvider({ userId, onOpportunityChange, onNotification, children }) {
   const supabase = useSupabase();
 
   useEffect(() => {
@@ -11,8 +11,8 @@ export function RealtimeProvider({ userId, onApplicationChange, onNotification, 
       .channel(`user-${userId}`)
       .on(
         "postgres_changes",
-        { event: "*", schema: "public", table: "applications", filter: `user_id=eq.${userId}` },
-        (payload) => onApplicationChange?.(payload.new)
+        { event: "*", schema: "public", table: "opportunities", filter: `user_id=eq.${userId}` },
+        (payload) => onOpportunityChange?.(payload.new)
       )
       .on(
         "postgres_changes",
@@ -24,7 +24,7 @@ export function RealtimeProvider({ userId, onApplicationChange, onNotification, 
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [supabase, userId, onApplicationChange, onNotification]);
+  }, [supabase, userId, onOpportunityChange, onNotification]);
 
   return <>{children}</>;
 }

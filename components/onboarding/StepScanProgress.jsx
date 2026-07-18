@@ -16,7 +16,7 @@ export function StepScanProgress({ onNext }) {
         const res = await fetch("/api/gmail/scan", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ mode: "initial" }),
+          body: JSON.stringify({ mode: "initial", type: "job" }),
           signal: controller.signal,
         });
         if (!res.ok) { setError("Scan failed. Please try again."); return; }

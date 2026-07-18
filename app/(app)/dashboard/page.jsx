@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { ApplicationsTable } from "@/components/dashboard/ApplicationsTable";
+import { OpportunitiesTable } from "@/components/dashboard/OpportunitiesTable";
+import { MissionControl } from "@/components/dashboard/mission-control/MissionControl";
 
 export const metadata = { title: "Dashboard — Job Hunt Intel" };
 
@@ -13,17 +14,38 @@ export default async function DashboardPage() {
 
   if (!user) redirect("/login");
 
-  const { data: applications } = await supabase
-    .from("applications")
+  const { data: opportunities } = await supabase
+    .from("opportunities")
     .select("*")
     .eq("user_id", user.id)
     .order("last_activity_at", { ascending: false });
 
+  const [{ data: replies }, { data: notifications }] = await Promise.all([
+    supabase
+      .from("interaction_events")
+      .select("id, opportunity_id, subject, from_address, received_at, opportunities(organization_name)")
+      .eq("user_id", user.id)
+      .eq("direction", "received")
+      .order("received_at", { ascending: false })
+      .limit(5),
+    supabase
+      .from("notifications")
+      .select("*")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false })
+      .limit(8),
+  ]);
+
   return (
     <div className="p-6 flex flex-col gap-6">
-      <h1 className="text-2xl font-bold">Applications</h1>
-      <ApplicationsTable
-        initialApplications={applications ?? []}
+      <h1 className="text-2xl font-bold">Dashboard</h1>
+      <MissionControl
+        opportunities={opportunities ?? []}
+        replies={replies ?? []}
+        notifications={notifications ?? []}
+      />
+      <OpportunitiesTable
+        initialOpportunities={opportunities ?? []}
         userId={user.id}
       />
     </div>

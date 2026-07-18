@@ -12,7 +12,7 @@ export function StepDone({ detected }) {
           Found <strong>{detected}</strong> application{detected !== 1 ? "s" : ""} in your Gmail.
         </p>
       </div>
-      <Button render={<Link href="/dashboard" />}>Go to Dashboard</Button>
+      <Button render={<Link href="/dashboard" />} nativeButton={false}>Go to Dashboard</Button>
     </div>
   );
 }

@@ -10,7 +10,7 @@ jest.mock('@/lib/supabase/server', () => ({
       select: jest.fn().mockReturnValue({
         eq: jest.fn().mockReturnValue({
           single: jest.fn().mockResolvedValue({
-            data: { follow_up_delay_days: 7, email_digest_enabled: false, scan_lookback_days: 90 },
+            data: { stale_threshold_days: 7, email_digest_enabled: false, detection_lookback_days: 90 },
           }),
         }),
       }),

@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useSupabase } from "@/components/providers/SupabaseProvider";
 
 export function SettingsForm({ userId, settings }) {
-  const [followUpDays, setFollowUpDays] = useState(settings.follow_up_delay_days);
+  const [followUpDays, setFollowUpDays] = useState(settings.stale_threshold_days);
   const [digestEnabled, setDigestEnabled] = useState(settings.email_digest_enabled);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -19,7 +19,7 @@ export function SettingsForm({ userId, settings }) {
     setSaveError(null);
     const { error } = await supabase
       .from("user_settings")
-      .update({ follow_up_delay_days: Number(followUpDays), email_digest_enabled: digestEnabled })
+      .update({ stale_threshold_days: Number(followUpDays), email_digest_enabled: digestEnabled })
       .eq("user_id", userId);
     setSaving(false);
     if (error) { setSaveError("Failed to save. Please try again."); return; }

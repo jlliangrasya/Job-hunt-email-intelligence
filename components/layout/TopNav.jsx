@@ -1,11 +1,13 @@
 "use client";
 import { NotificationBell } from "./NotificationBell";
+import { ThemeToggle } from "./ThemeToggle";
 
 export function TopNav({ user, notificationCount, notifications, onMarkRead }) {
   return (
     <header className="flex items-center justify-between px-6 h-14 border-b border-border shrink-0 bg-background shadow-sm">
       <div />
       <div className="flex items-center gap-4">
+        <ThemeToggle />
         <NotificationBell
           count={notificationCount}
           notifications={notifications}

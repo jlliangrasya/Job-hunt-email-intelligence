@@ -16,7 +16,7 @@ export function StepConnectGmail({ onNext }) {
         </p>
       </div>
       <div className="flex flex-col gap-2 w-full max-w-xs">
-        <Button render={<Link href="/login" />}>Connect Gmail</Button>
+        <Button render={<Link href="/login" />} nativeButton={false}>Connect Gmail</Button>
         <Button variant="ghost" onClick={onNext}>
           Already connected — continue
         </Button>

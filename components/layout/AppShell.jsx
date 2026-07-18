@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { RealtimeProvider } from "@/components/providers/RealtimeProvider";
+import { PageTransition } from "@/components/motion/PageTransition";
 import { Sidebar } from "./Sidebar";
 import { TopNav } from "./TopNav";
 
@@ -37,7 +38,9 @@ export function AppShell({ userId, user, children }) {
             notifications={notifications}
             onMarkRead={handleMarkRead}
           />
-          <main className="flex-1 overflow-auto">{children}</main>
+          <main className="flex-1 overflow-auto">
+            <PageTransition>{children}</PageTransition>
+          </main>
         </div>
       </div>
     </RealtimeProvider>
