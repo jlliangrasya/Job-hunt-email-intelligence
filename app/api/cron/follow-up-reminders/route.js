@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { verifyCronSecret } from "@/lib/utils/cron-secret";
 import { createServiceClient } from "@/lib/supabase/server";
 import { getDomainConfig } from "@/lib/opportunity/domain-config";
+import { priorityFields } from "@/lib/opportunity/priority";
 
 export async function GET(request) {
   if (!verifyCronSecret(request)) {
@@ -23,7 +24,7 @@ export async function GET(request) {
 
     const { data: opportunities } = await supabase
       .from("opportunities")
-      .select("id, type, status, organization_name, initiated_at")
+      .select("id, type, status, organization_name, initiated_at, last_activity_at")
       .eq("user_id", user_id)
       .eq("is_archived", false)
       .lt("initiated_at", cutoff.toISOString().split("T")[0]);
@@ -32,12 +33,20 @@ export async function GET(request) {
       const { staleStatus, staleTransitionStatus } = getDomainConfig(opp.type);
       if (opp.status !== staleStatus) continue;
 
+      const followUpDueAt = new Date().toISOString();
+
       await supabase
         .from("opportunities")
         .update({
           status: staleTransitionStatus,
-          follow_up_due_at: new Date().toISOString(),
+          follow_up_due_at: followUpDueAt,
           updated_at: new Date().toISOString(),
+          ...priorityFields({
+            type: opp.type,
+            status: staleTransitionStatus,
+            last_activity_at: opp.last_activity_at,
+            follow_up_due_at: followUpDueAt,
+          }),
         })
         .eq("id", opp.id);
 
