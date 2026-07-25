@@ -21,6 +21,14 @@ export default function LoginPage() {
   return (
     <div className="flex min-h-screen items-center justify-center p-6">
       <div className="flex flex-col items-center gap-6 text-center max-w-sm">
+        <div className="rounded-xl border bg-primary/5 px-5 py-4 text-left">
+          <p className="font-semibold">🎂 Happy birthday, Ate Kylyn!</p>
+          <p className="text-sm text-muted-foreground mt-2 leading-relaxed">
+            Hope today's a good one — the kind with your favorite food, no stress, and people
+            around you who appreciate you as much as we do. Thank you for always looking out
+            for us. Enjoy your day, you deserve it. Love you, Ate!
+          </p>
+        </div>
         <div className="size-16 rounded-full bg-primary/10 flex items-center justify-center">
           <Mail className="size-8 text-primary" />
         </div>
