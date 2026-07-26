@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { OnboardingWizard } from "@/components/onboarding/OnboardingWizard";
 
-export const metadata = { title: "Setup — Job Hunt Intel" };
+export const metadata = { title: "Setup — Hustle Hunter" };
 
 export default async function OnboardingPage() {
   const supabase = await createClient();
@@ -32,7 +32,7 @@ export default async function OnboardingPage() {
   return (
     <div className="p-6 flex flex-col gap-6 max-w-xl mx-auto">
       <div>
-        <h1 className="text-2xl font-bold">Welcome to Job Hunt Intel</h1>
+        <h1 className="text-2xl font-bold">Welcome to Hustle Hunter</h1>
         <p className="text-muted-foreground mt-1">Let's get your applications set up.</p>
       </div>
       <OnboardingWizard hasGmail={hasGmail} />

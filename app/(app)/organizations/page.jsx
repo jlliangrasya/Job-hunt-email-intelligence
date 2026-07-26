@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { OrganizationsTable } from "@/components/organizations/OrganizationsTable";
 
-export const metadata = { title: "Organizations — Job Hunt Intel" };
+export const metadata = { title: "Organizations — Hustle Hunter" };
 
 export default async function OrganizationsPage() {
   const supabase = await createClient();

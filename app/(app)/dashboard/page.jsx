@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { OpportunitiesTable } from "@/components/dashboard/OpportunitiesTable";
 import { MissionControl } from "@/components/dashboard/mission-control/MissionControl";
 
-export const metadata = { title: "Dashboard — Job Hunt Intel" };
+export const metadata = { title: "Dashboard — Hustle Hunter" };
 
 export default async function DashboardPage() {
   const supabase = await createClient();

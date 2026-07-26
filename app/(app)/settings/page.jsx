@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { SettingsForm } from "@/components/settings/SettingsForm";
 
-export const metadata = { title: "Settings — Job Hunt Intel" };
+export const metadata = { title: "Settings — Hustle Hunter" };
 
 export default async function SettingsPage() {
   const supabase = await createClient();

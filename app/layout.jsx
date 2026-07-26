@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "Job Hunt Intelligence",
+  title: "Hustle Hunter",
   description: "Track your job applications, classify replies, and draft follow-ups with AI.",
 };
 

@@ -1,8 +1,20 @@
 import { NextResponse, after } from "next/server";
 import { processWebhookEvent } from "@/lib/pipeline/process-webhook";
 
-/** Pub/Sub push endpoint — no auth guard (see proxy.js matcher exclusion). */
+/**
+ * Pub/Sub push endpoint — excluded from the normal auth guard (see proxy.js
+ * matcher exclusion), so it authenticates itself via a shared-secret query
+ * token instead. Configure the Pub/Sub push subscription's endpoint URL as
+ * `<NEXT_PUBLIC_SITE_URL>/api/webhooks/gmail?token=<GMAIL_WEBHOOK_SECRET>`.
+ */
 export async function POST(request) {
+  const token = new URL(request.url).searchParams.get("token");
+  const secret = process.env.GMAIL_WEBHOOK_SECRET;
+
+  if (!secret || token !== secret) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const body = await request.json().catch(() => null);
   const dataB64 = body?.message?.data;
 

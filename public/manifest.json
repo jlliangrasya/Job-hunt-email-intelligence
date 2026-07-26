@@ -1,6 +1,6 @@
 {
-  "name": "Job Hunt Intelligence",
-  "short_name": "JobHunt AI",
+  "name": "Hustle Hunter",
+  "short_name": "Hustle Hunter",
   "description": "Track your job applications, classify replies, and draft follow-ups with AI.",
   "start_url": "/dashboard",
   "display": "standalone",

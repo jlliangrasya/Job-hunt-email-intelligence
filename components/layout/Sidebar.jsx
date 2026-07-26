@@ -38,7 +38,7 @@ export function Sidebar() {
     <aside className="w-56 flex flex-col border-r border-border bg-card shrink-0">
       <div className="flex items-center gap-2.5 px-4 h-14 border-b border-border">
         <Briefcase className="size-5 text-primary" />
-        <span className="font-semibold text-base tracking-tight">Job Hunt Intel</span>
+        <span className="font-semibold text-base tracking-tight">Hustle Hunter</span>
       </div>
       <nav className="flex flex-col gap-1 p-2 flex-1">
         {NAV_ITEMS.map((item) => {
