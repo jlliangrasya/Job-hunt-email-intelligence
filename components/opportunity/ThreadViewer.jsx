@@ -1,14 +1,6 @@
 import { relativeTime } from "@/lib/utils/date";
 import { cn } from "@/lib/utils";
-
-const SIGNAL_TYPE_LABELS = {
-  interview_invite: "Interview Invite",
-  rejection:        "Rejection",
-  info_request:     "Info Request",
-  offer:            "Offer",
-  acknowledgment:   "Acknowledgment",
-  other:            "Other",
-};
+import { SignalBadge } from "./SignalBadge";
 
 export function ThreadViewer({ messages }) {
   if (!messages?.length) {
@@ -32,11 +24,7 @@ export function ThreadViewer({ messages }) {
           <div className="flex items-center justify-between gap-4 mb-2">
             <span className="text-sm font-medium">{msg.from_address}</span>
             <div className="flex items-center gap-2">
-              {msg.signal_type && (
-                <span className="text-xs rounded-full bg-violet-100 text-violet-700 px-2 py-0.5 font-medium dark:bg-violet-900/30 dark:text-violet-300">
-                  {SIGNAL_TYPE_LABELS[msg.signal_type] ?? msg.signal_type}
-                </span>
-              )}
+              <SignalBadge signalType={msg.signal_type} />
               <span className="text-xs text-muted-foreground">
                 {msg.received_at ? relativeTime(msg.received_at) : ""}
               </span>

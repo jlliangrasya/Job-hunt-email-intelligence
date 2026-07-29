@@ -1,6 +1,6 @@
 # AI Opportunity Intelligence Platform — Roadmap & Team Split
 
-Status as of this document: **Phases 1-2 done, Phases 3-8 not started.**
+Status as of this document: **Phases 1-3 done, Phases 4-8 not started.**
 
 ---
 
@@ -18,7 +18,7 @@ Stack: Next.js 16 (App Router/Turbopack), Supabase (Postgres/Auth/Realtime/RLS),
 |---|---|---|
 | 1 | **Foundation** — design system (light/dark toggle, motion), full nav IA, Organizations + Contacts entities | ✅ Done |
 | 2 | **Mission Control Dashboard** — AI daily briefing, priority ranking, funnel, follow-ups, replies, activity feed, quick actions | ✅ Done |
-| 3 | **Opportunity Engine v2** — formal priority/score field, tabbed opportunity detail page | ⬜ Not started |
+| 3 | **Opportunity Engine v2** — formal priority/score field, tabbed opportunity detail page | ✅ Done |
 | 4 | **Research Engine** — org/contact intelligence gathering (needs an enrichment data-source decision) | ⬜ Not started |
 | 5 | **Signals + Analytics** — live intelligence feed, generated-insight analytics | ⬜ Not started |
 | 6 | **Campaigns + unified Interactions** — sequence/step outreach model, multi-channel-shaped | ⬜ Not started |
@@ -38,7 +38,13 @@ Stack: Next.js 16 (App Router/Turbopack), Supabase (Postgres/Auth/Realtime/RLS),
 - `/dashboard` rebuilt around `components/dashboard/mission-control/`: AI-generated **Today's Briefing** (`lib/groq/generate-briefing.js`, strictly grounded in real data — never invents companies/events), **Quick Actions** (rescan Gmail inline), **Opportunity Funnel**, **Priority Opportunities** (interim heuristic in `lib/opportunity/priority.js`), **Upcoming Follow-ups**, **Recent Replies**, **Activity Feed**.
 - Old `StatsCards` deleted (superseded by the funnel widget).
 
-**Current test/build state**: 17 suites / 61 tests passing, production build compiles clean (25 routes).
+### Phase 3 — Opportunity Engine v2
+- **Priority scoring engine** (`lib/opportunity/priority.js`): per-type status weight (from `domain-config`) + recency bonus + capped overdue bonus. Persisted to `opportunities.priority_score` / `priority_reason` (migration `0004`) at every write path — discovery scan, reply webhook, stale-follow-up cron, and manual `PATCH /api/opportunities/[id]` status edits.
+- **Tabbed opportunity detail page** (`components/opportunity/OpportunityTabs.jsx`): Overview (meta + live priority meter), Thread (live Gmail), Timeline (stored `interaction_events`), Contacts, AI Drafts, Notes. Active tab mirrors to `?tab=` via `replaceState`; inactive panels stay mounted so unsaved draft/note edits survive a tab switch. Full keyboard tablist semantics (arrows/Home/End, roving tabindex).
+- Only tabs with real data behind them were built — Research/Campaigns/Interactions arrive with Phases 4-6 rather than shipping as stubs.
+- Fixed: the detail page previously loaded its thread by `fetch`ing its own API route with an absolute URL, which forwards no auth cookies and would 401 in production. It now calls `fetchThread` directly; the route remains for client-side consumers.
+
+**Current test/build state**: 22 suites / 100 tests passing, production build compiles clean (25 routes).
 
 ---
 
