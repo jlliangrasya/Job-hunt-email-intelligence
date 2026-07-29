@@ -26,7 +26,11 @@ export async function POST(request) {
         controller.enqueue(encoder.encode("data: [DONE]\n\n"));
       } catch (e) {
         console.error("Scan failed:", e);
-        controller.enqueue(encoder.encode(`data: ${JSON.stringify({ error: true })}\n\n`));
+        controller.enqueue(
+          encoder.encode(
+            `data: ${JSON.stringify({ error: true, message: e?.message ?? "Unknown error" })}\n\n`
+          )
+        );
       } finally {
         controller.close();
       }

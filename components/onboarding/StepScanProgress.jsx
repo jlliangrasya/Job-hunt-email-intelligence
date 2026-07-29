@@ -31,7 +31,18 @@ export function StepScanProgress({ onNext }) {
           for (const line of lines) {
             const payload = line.slice(6).trim();
             if (payload === "[DONE]") { reader.cancel(); setDone(true); return; }
-            try { setProgress(JSON.parse(payload)); } catch (e) { console.error("SSE parse error:", e); }
+            try {
+              const data = JSON.parse(payload);
+              // The server streams {error:true} instead of closing, so surface it
+              // rather than letting it masquerade as a progress update.
+              if (data.error) {
+                console.error("Scan failed:", data.message);
+                setError("Scan failed. Please try again.");
+                reader.cancel();
+                return;
+              }
+              setProgress(data);
+            } catch (e) { console.error("SSE parse error:", e); }
           }
         }
         setDone(true);
