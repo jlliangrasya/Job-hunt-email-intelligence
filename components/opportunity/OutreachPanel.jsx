@@ -14,6 +14,7 @@ export function OutreachPanel({ opportunityId, type = "job", initialDrafts }) {
   const [generating, setGenerating] = useState(false);
   const [activeDraftId, setActiveDraftId] = useState(initialDrafts[0]?.id ?? null);
   const [sending, setSending] = useState(false);
+  const [sendError, setSendError] = useState(null);
 
   async function handleGenerate() {
     setGenerating(true);
@@ -46,6 +47,7 @@ export function OutreachPanel({ opportunityId, type = "job", initialDrafts }) {
 
   async function handleSend(draftId) {
     setSending(true);
+    setSendError(null);
     try {
       const res = await fetch("/api/gmail/send", {
         method: "POST",
@@ -56,6 +58,13 @@ export function OutreachPanel({ opportunityId, type = "job", initialDrafts }) {
         setDrafts((prev) =>
           prev.map((d) => (d.id === draftId ? { ...d, was_sent: true } : d))
         );
+      } else {
+        // Sends can fail for a reason the user can act on — most often an
+        // opportunity detected from an automated confirmation, which has no
+        // reply address yet — so surface the server's message instead of
+        // leaving the click looking like it did nothing.
+        const { error } = await res.json().catch(() => ({}));
+        setSendError(error ?? "Could not send. Please try again.");
       }
     } finally {
       setSending(false);
@@ -99,6 +108,10 @@ export function OutreachPanel({ opportunityId, type = "job", initialDrafts }) {
             </Button>
           ))}
         </div>
+      )}
+
+      {sendError && (
+        <p role="alert" className="text-sm text-destructive">{sendError}</p>
       )}
 
       {activeDraft ? (

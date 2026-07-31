@@ -13,7 +13,10 @@ export default function LoginPage() {
       options: {
         scopes: "https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/gmail.send",
         queryParams: { access_type: "offline", prompt: "consent" },
-        redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`,
+        // Derived from the live origin rather than NEXT_PUBLIC_SITE_URL: that var is
+        // inlined at build time, so a missing/stale value silently produced
+        // "undefined/auth/callback" and Supabase fell back to its Site URL.
+        redirectTo: `${window.location.origin}/auth/callback`,
       },
     });
   }

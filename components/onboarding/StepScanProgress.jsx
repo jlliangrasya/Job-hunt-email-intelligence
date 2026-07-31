@@ -62,7 +62,7 @@ export function StepScanProgress({ onNext }) {
       <div>
         <h2 className="text-xl font-bold">Scanning your Gmail</h2>
         <p className="text-muted-foreground mt-1">
-          Looking through your sent mail for job applications...
+          Looking through your sent mail and application confirmations...
         </p>
       </div>
 

@@ -25,8 +25,37 @@ export async function POST(request) {
     .single();
 
   const opportunity = draft.opportunities;
+
+  // Opportunities detected from a board/ATS confirmation have no reply target
+  // until a human writes in (the confirmation itself comes from a no-reply
+  // address). Without this guard the send would go out addressed to `undefined`.
+  if (!opportunity.recipient_email) {
+    return NextResponse.json(
+      {
+        error:
+          "No reply address for this opportunity yet — it was detected from an automated confirmation. Add a contact address once someone from the organization emails you.",
+      },
+      { status: 400 }
+    );
+  }
+
   const body = draft.body_edited ?? draft.body_markdown;
   const subject = draft.subject?.startsWith("Re:") ? draft.subject : `Re: ${draft.subject ?? opportunity.subject}`;
+
+  // Reply into the thread the person actually wrote from, which is not always
+  // the originating one: an opportunity detected from a board confirmation has
+  // that no-reply thread as `channel_thread_id`, while the human who eventually
+  // replied did so in a different thread linked to the same opportunity.
+  const { data: lastReceived } = await supabase
+    .from("interaction_events")
+    .select("channel_thread_id")
+    .eq("opportunity_id", opportunity.id)
+    .eq("direction", "received")
+    .order("received_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  const threadId = lastReceived?.channel_thread_id ?? opportunity.channel_thread_id;
 
   const messageId = await sendEmail({
     userId: user.id,
@@ -34,7 +63,7 @@ export async function POST(request) {
     to: opportunity.recipient_email,
     subject,
     body,
-    threadId: opportunity.channel_thread_id,
+    threadId,
   });
 
   await supabase
@@ -53,7 +82,7 @@ export async function POST(request) {
       opportunity_id: opportunity.id,
       channel: "email",
       channel_message_id: messageId,
-      channel_thread_id: opportunity.channel_thread_id,
+      channel_thread_id: threadId,
       direction: "sent",
       from_address: tokenRow?.gmail_address,
       to_addresses: [opportunity.recipient_email],

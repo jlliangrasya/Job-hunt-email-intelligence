@@ -11,6 +11,7 @@ const SIGNAL_META = {
   info_request:     { label: "Info Request",     className: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300" },
   offer:            { label: "Offer",            className: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300" },
   acknowledgment:   { label: "Acknowledgment",   className: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300" },
+  application_confirmation: { label: "Application Confirmed", className: "bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-300" },
   other:            { label: "Other",            className: "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400" },
 };
 

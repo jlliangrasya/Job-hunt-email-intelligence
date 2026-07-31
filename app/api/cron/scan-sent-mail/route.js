@@ -7,6 +7,11 @@ import { discoverOpportunities } from "@/lib/gmail/scan";
  * Gmail watches only cover INBOX (see lib/gmail/watch.js), so newly sent
  * opportunity emails have no realtime push — a short-lookback rescan is the
  * incremental-detection mechanism for the Sent folder.
+ *
+ * Despite the route name (kept because the deployed cron schedule in
+ * vercel.json points at this path), the rescan now covers both directions:
+ * discoverOpportunities also re-runs the inbound confirmation pass, which
+ * backstops any push notification the webhook missed or errored on.
  */
 async function runIncrementalScan(userId) {
   for await (const _progress of discoverOpportunities(userId, "job", 2)) {
