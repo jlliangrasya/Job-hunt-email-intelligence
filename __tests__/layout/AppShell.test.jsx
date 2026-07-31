@@ -1,12 +1,18 @@
 import { render, screen } from '@testing-library/react'
 import { AppShell } from '@/components/layout/AppShell'
 
-jest.mock('next/navigation', () => ({ usePathname: () => '/dashboard' }))
+jest.mock('next/navigation', () => ({
+  usePathname: () => '/dashboard',
+  useRouter: () => ({ push: jest.fn(), refresh: jest.fn() }),
+}))
 jest.mock('@/components/providers/RealtimeProvider', () => ({
   RealtimeProvider: ({ children }) => <>{children}</>,
 }))
 jest.mock('@/components/layout/NotificationBell', () => ({
   NotificationBell: () => <div data-testid="notification-bell" />,
+}))
+jest.mock('@/components/providers/SupabaseProvider', () => ({
+  useSupabase: () => ({ auth: { signOut: jest.fn() } }),
 }))
 
 global.fetch = jest.fn().mockResolvedValue({

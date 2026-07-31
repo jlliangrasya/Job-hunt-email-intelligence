@@ -23,12 +23,12 @@ const NAV_ITEMS = [
   { href: "/organizations", label: "Organizations", icon: Building2 },
   { href: "/contacts", label: "Contacts", icon: Users },
   { label: "Research", icon: Search, soon: true },
-  { label: "Signals", icon: Radio, soon: true },
-  { label: "Campaigns", icon: Send, soon: true },
-  { label: "Interactions", icon: MessagesSquare, soon: true },
-  { label: "Knowledge", icon: BookOpen, soon: true },
+  { href: "/signals", label: "Signals", icon: Radio },
+  { href: "/campaigns", label: "Campaigns", icon: Send },
+  { href: "/interactions", label: "Interactions", icon: MessagesSquare },
+  { href: "/knowledge", label: "Knowledge", icon: BookOpen },
   { label: "AI Workspace", icon: Sparkles, soon: true },
-  { label: "Analytics", icon: BarChart3, soon: true },
+  { href: "/analytics", label: "Analytics", icon: BarChart3 },
   { href: "/settings", label: "Settings", icon: Settings },
 ];
 

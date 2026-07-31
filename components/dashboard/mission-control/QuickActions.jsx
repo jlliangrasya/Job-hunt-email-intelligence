@@ -2,14 +2,32 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { RefreshCw, Building2, Users, Settings, Loader2 } from "lucide-react";
+import { RefreshCw, Building2, Users, Settings, Send, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { WidgetCard } from "./WidgetCard";
 
 export function QuickActions() {
   const [scanning, setScanning] = useState(false);
   const [scanResult, setScanResult] = useState(null);
+  const [processing, setProcessing] = useState(false);
+  const [processResult, setProcessResult] = useState(null);
   const router = useRouter();
+
+  async function handleProcessCampaignSteps() {
+    setProcessing(true);
+    setProcessResult(null);
+    try {
+      const res = await fetch("/api/campaigns/process-due", { method: "POST" });
+      if (!res.ok) throw new Error("Failed");
+      const { processed } = await res.json();
+      setProcessResult(`Processed ${processed} due step${processed === 1 ? "" : "s"}`);
+      router.refresh();
+    } catch {
+      setProcessResult("Failed — try again");
+    } finally {
+      setProcessing(false);
+    }
+  }
 
   async function handleRescan() {
     setScanning(true);
@@ -25,6 +43,7 @@ export function QuickActions() {
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
       let detected = 0;
+      let scanError = null;
 
       while (true) {
         const { done, value } = await reader.read();
@@ -35,12 +54,17 @@ export function QuickActions() {
           if (payload === "[DONE]") continue;
           try {
             const parsed = JSON.parse(payload);
-            if (typeof parsed.detected === "number") detected = parsed.detected;
+            if (parsed.error) scanError = parsed.message ?? "Unknown error";
+            else if (typeof parsed.detected === "number") detected = parsed.detected;
           } catch {}
         }
       }
 
-      setScanResult(`Found ${detected} new opportunit${detected === 1 ? "y" : "ies"}`);
+      if (scanError) {
+        setScanResult(`Scan error: ${scanError}`);
+      } else {
+        setScanResult(`Found ${detected} new opportunit${detected === 1 ? "y" : "ies"}`);
+      }
       router.refresh();
     } catch {
       setScanResult("Scan failed — try again");
@@ -57,6 +81,17 @@ export function QuickActions() {
           {scanning ? "Scanning Gmail..." : "Rescan Gmail"}
         </Button>
         {scanResult && <p className="text-xs text-muted-foreground pl-1">{scanResult}</p>}
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={handleProcessCampaignSteps}
+          disabled={processing}
+          className="justify-start gap-2"
+        >
+          {processing ? <Loader2 className="size-3.5 animate-spin" /> : <Send className="size-3.5" />}
+          {processing ? "Processing..." : "Process Due Campaign Steps"}
+        </Button>
+        {processResult && <p className="text-xs text-muted-foreground pl-1">{processResult}</p>}
         <Button size="sm" variant="outline" render={<Link href="/organizations" />} nativeButton={false} className="justify-start gap-2">
           <Building2 className="size-3.5" /> Add Organization
         </Button>
