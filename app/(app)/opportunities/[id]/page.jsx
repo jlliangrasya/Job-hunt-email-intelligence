@@ -9,6 +9,7 @@ import { TimelineTab } from "@/components/opportunity/TimelineTab";
 import { ContactsTab } from "@/components/opportunity/ContactsTab";
 import { NotesTab } from "@/components/opportunity/NotesTab";
 import { OutreachPanel } from "@/components/opportunity/OutreachPanel";
+import { CampaignTab } from "@/components/opportunity/CampaignTab";
 
 /**
  * Loads the Gmail thread directly rather than through /api/opportunities/[id]/thread.
@@ -84,21 +85,45 @@ export default async function OpportunityDetailPage({ params, searchParams }) {
 
   if (!opportunity) notFound();
 
-  const [messages, contacts, { data: events }, { data: drafts }] = await Promise.all([
-    loadThread(supabase, user.id, opportunity),
-    loadContacts(supabase, user.id, opportunity),
-    supabase
-      .from("interaction_events")
-      .select("*")
-      .eq("opportunity_id", id)
-      .eq("user_id", user.id)
-      .order("received_at", { ascending: false }),
-    supabase
-      .from("outreach_drafts")
-      .select("*")
-      .eq("opportunity_id", id)
-      .order("created_at", { ascending: false }),
-  ]);
+  const [messages, contacts, { data: events }, { data: drafts }, { data: enrollment }, { data: campaigns }] =
+    await Promise.all([
+      loadThread(supabase, user.id, opportunity),
+      loadContacts(supabase, user.id, opportunity),
+      supabase
+        .from("interaction_events")
+        .select("*")
+        .eq("opportunity_id", id)
+        .eq("user_id", user.id)
+        .order("received_at", { ascending: false }),
+      supabase
+        .from("outreach_drafts")
+        .select("*")
+        .eq("opportunity_id", id)
+        .order("created_at", { ascending: false }),
+      supabase
+        .from("campaign_enrollments")
+        .select("*, campaigns(id, name)")
+        .eq("opportunity_id", id)
+        .eq("user_id", user.id)
+        .order("enrolled_at", { ascending: false })
+        .limit(1)
+        .maybeSingle(),
+      supabase
+        .from("campaigns")
+        .select("id, name")
+        .eq("user_id", user.id)
+        .eq("is_archived", false)
+        .order("name", { ascending: true }),
+    ]);
+
+  let stepCount = 0;
+  if (enrollment) {
+    const { count } = await supabase
+      .from("campaign_steps")
+      .select("id", { count: "exact", head: true })
+      .eq("campaign_id", enrollment.campaign_id);
+    stepCount = count ?? 0;
+  }
 
   const tabs = [
     {
@@ -138,6 +163,18 @@ export default async function OpportunityDetailPage({ params, searchParams }) {
           opportunityId={id}
           type={opportunity.type}
           initialDrafts={drafts ?? []}
+        />
+      ),
+    },
+    {
+      id: "campaign",
+      label: "Campaign",
+      content: (
+        <CampaignTab
+          opportunityId={id}
+          enrollment={enrollment ?? null}
+          availableCampaigns={campaigns ?? []}
+          stepCount={stepCount}
         />
       ),
     },

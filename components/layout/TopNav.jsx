@@ -1,6 +1,7 @@
 "use client";
 import { NotificationBell } from "./NotificationBell";
 import { ThemeToggle } from "./ThemeToggle";
+import { SignOutButton } from "./SignOutButton";
 
 export function TopNav({ user, notificationCount, notifications, onMarkRead }) {
   return (
@@ -14,6 +15,7 @@ export function TopNav({ user, notificationCount, notifications, onMarkRead }) {
           onMarkRead={onMarkRead}
         />
         <span className="bg-muted rounded-full px-3 py-1 text-sm text-foreground">{user.email}</span>
+        <SignOutButton />
       </div>
     </header>
   );
