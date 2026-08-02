@@ -37,11 +37,15 @@
 -- would aim outreach at a black hole. Inbound-detected rows keep
 -- recipient_email NULL until a real human replies (the webhook fills it in) and
 -- record the confirmation sender here as provenance only.
+-- `if not exists` throughout so this can be re-run against a database whose
+-- state is uncertain. The application code writes all four of these columns on
+-- every detection, so a database that has not had this migration applied cannot
+-- record an opportunity at all — running it again must be safe, not a gamble.
 alter table public.opportunities
-  add column channel_thread_ids text[] not null default '{}',
-  add column detection_source   text   not null default 'sent',
-  add column dedup_key          text,
-  add column source_email       text;
+  add column if not exists channel_thread_ids text[] not null default '{}',
+  add column if not exists detection_source   text   not null default 'sent',
+  add column if not exists dedup_key          text,
+  add column if not exists source_email       text;
 
 comment on column public.opportunities.channel_thread_ids is
   'Every channel thread linked to this opportunity, including channel_thread_id.';
@@ -57,7 +61,9 @@ update public.opportunities
  where channel_thread_id is not null
    and channel_thread_ids = '{}';
 
-create index opportunities_thread_ids_idx on public.opportunities using gin (channel_thread_ids);
+create index if not exists opportunities_thread_ids_idx
+  on public.opportunities using gin (channel_thread_ids);
 
-create index opportunities_dedup_idx on public.opportunities(user_id, type, dedup_key)
+create index if not exists opportunities_dedup_idx
+  on public.opportunities(user_id, type, dedup_key)
   where dedup_key is not null;

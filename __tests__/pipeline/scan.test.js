@@ -59,9 +59,9 @@ function mockGmail() {
 
 function stubSupabase() {
   const builder = {
-    from: () => builder,
-    update: () => builder,
-    eq: () => Promise.resolve({ data: null, error: null }),
+    from: jest.fn(() => builder),
+    update: jest.fn(() => builder),
+    eq: jest.fn(() => Promise.resolve({ data: null, error: null })),
   }
   createServiceClient.mockResolvedValue(builder)
   return builder
@@ -105,8 +105,8 @@ test('scans both the sent folder and inbound confirmations', async () => {
   // Both passes are counted into `total` up front so the progress bar never
   // jumps backwards when the second pass begins.
   expect(progress).toEqual([
-    { scanned: 1, total: 2, detected: 1 },
-    { scanned: 2, total: 2, detected: 2 },
+    { scanned: 1, total: 2, detected: 1, failed: 0 },
+    { scanned: 2, total: 2, detected: 2, failed: 0 },
   ])
 })
 
@@ -160,7 +160,52 @@ test('a thread already linked to an application is not counted as a new detectio
 
   const progress = await drain(discoverOpportunities('user-1', 'job', 90))
 
-  expect(progress.at(-1)).toEqual({ scanned: 2, total: 2, detected: 0 })
+  expect(progress.at(-1)).toEqual({ scanned: 2, total: 2, detected: 0, failed: 0 })
+})
+
+// A scan that cannot write is not a scan that found nothing. Reporting one as
+// the other is how an unapplied migration hid behind a clean "0 detected" run
+// and a completed-looking onboarding.
+describe('when writes are rejected', () => {
+  // These paths log every rejected write by design; silence it so a passing run
+  // does not look like a failing one.
+  beforeEach(() => jest.spyOn(console, 'error').mockImplementation(() => {}))
+  afterEach(() => console.error.mockRestore())
+
+  const rejectWrites = () =>
+    linkOrCreateOpportunity.mockRejectedValue(
+      new Error('Opportunity upsert failed: column "channel_thread_ids" does not exist')
+    )
+
+  test('the scan fails loudly instead of reporting an empty mailbox', async () => {
+    mockGmail()
+    rejectWrites()
+
+    await expect(drain(discoverOpportunities('user-1', 'job', 90))).rejects.toThrow(
+      /could not save any of 2 detected opportunities.*channel_thread_ids/s
+    )
+  })
+
+  test('initial discovery is not marked complete, so the next run retries', async () => {
+    mockGmail()
+    rejectWrites()
+    const supabase = stubSupabase()
+
+    await drain(discoverOpportunities('user-1', 'job', 90)).catch(() => {})
+
+    expect(supabase.update).not.toHaveBeenCalled()
+  })
+
+  test('one bad message does not abort a scan that is otherwise working', async () => {
+    mockGmail()
+    linkOrCreateOpportunity
+      .mockRejectedValueOnce(new Error('transient'))
+      .mockResolvedValue({ opportunity: { id: 'opp-2' }, created: true, linked: false })
+
+    const progress = await drain(discoverOpportunities('user-1', 'job', 90))
+
+    expect(progress.at(-1)).toEqual({ scanned: 2, total: 2, detected: 1, failed: 1 })
+  })
 })
 
 test('an unparseable model date falls back to the message header, not to today', async () => {
